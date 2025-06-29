@@ -7,6 +7,7 @@ import com.smartloansuite.user_service.dto.UserResponseDTO;
 import com.smartloansuite.user_service.entity.User;
 import com.smartloansuite.user_service.exception.AuthenticationException;
 import com.smartloansuite.user_service.repository.UserRepository;
+import com.smartloansuite.user_service.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,14 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final JwtUtil jwtUtil;
 
     @Override
     public UserResponseDTO registerUser(UserRequestDTO request) {
 
         User user = User.builder()
                 .fullName(request.getFullName())
-                .email(request.getFullName())
+                .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role("USER")
                 .build();
@@ -51,7 +53,7 @@ public class UserServiceImpl implements UserService{
         }
 
         return LoginResponseDTO.builder()
-                .token("d2idj2odo2dm")
+                .token(jwtUtil.generateToken(request.getEmail()))
                 .message("Login successful.")
                 .build();
     }
