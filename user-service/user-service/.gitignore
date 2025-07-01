@@ -1,9 +1,17 @@
+# Help file
 HELP.md
+
+# Build directories
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Application configuration
+application.yml
+application.properties
+application-*.yml
+application-*.properties
 
 ### STS ###
 .apt_generated

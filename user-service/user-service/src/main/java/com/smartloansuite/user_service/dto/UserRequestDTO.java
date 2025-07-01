@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 public class UserRequestDTO {
     @NotBlank
     private String fullName;
+    @NotBlank
+    private String username;
     @Email
     private String email;
     @Size(min = 6)

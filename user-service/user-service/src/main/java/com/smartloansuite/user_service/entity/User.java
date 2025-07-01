@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -26,6 +25,9 @@ public class User implements UserDetails {
     private Long id;
 
     private String fullName;
+
+    @Column(unique = true, nullable = false)
+    private String username;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -53,7 +55,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;  // Using email as username
+        return username;
     }
 
     @Override

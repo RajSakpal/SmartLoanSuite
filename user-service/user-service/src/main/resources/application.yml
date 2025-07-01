@@ -7,6 +7,15 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: YOUR_CLIENT_ID
+            client-secret: YOUR_CLIENT_SECRET
+            scope: openid, profile, email
+            redirect-uri: "{baseUrl}/api/users/oauth/google"
 
   mail:
     host: smtp.gmail.com
