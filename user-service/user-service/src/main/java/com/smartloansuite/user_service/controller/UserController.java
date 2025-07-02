@@ -5,7 +5,6 @@ import com.smartloansuite.user_service.dto.LoginResponseDTO;
 import com.smartloansuite.user_service.dto.UserRequestDTO;
 import com.smartloansuite.user_service.dto.UserResponseDTO;
 import com.smartloansuite.user_service.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -13,7 +12,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,16 +28,6 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login (@Validated @RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(userService.loginUser(request));
-    }
-
-    @GetMapping("/oauth/google")
-    public void googleOAuthRedirect(OAuth2AuthenticationToken auth, HttpServletResponse response) throws IOException {
-        OAuth2User oAuth2User = auth.getPrincipal();
-        String jwt = (String) oAuth2User.getAttributes().get("jwt");
-
-        // Return JWT via redirect or direct JSON
-        String redirectUrl = "http://localhost:3000/oauth-success?token=" + jwt;
-        response.sendRedirect(redirectUrl);
     }
 
 }
