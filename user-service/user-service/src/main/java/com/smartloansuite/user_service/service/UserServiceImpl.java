@@ -4,30 +4,40 @@ import com.smartloansuite.user_service.dto.LoginRequestDTO;
 import com.smartloansuite.user_service.dto.LoginResponseDTO;
 import com.smartloansuite.user_service.dto.UserRequestDTO;
 import com.smartloansuite.user_service.dto.UserResponseDTO;
+import com.smartloansuite.user_service.entity.Role;
 import com.smartloansuite.user_service.entity.User;
+import com.smartloansuite.user_service.entity.enums.RoleName;
 import com.smartloansuite.user_service.exception.AuthenticationException;
+import com.smartloansuite.user_service.repository.RoleRepository;
 import com.smartloansuite.user_service.repository.UserRepository;
 import com.smartloansuite.user_service.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final JwtUtil jwtUtil;
 
     @Override
     public UserResponseDTO registerUser(UserRequestDTO request) {
 
+        // Fetch role from DB
+        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Default role not found"));
+
         User user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role("USER")
+                .roles(Set.of(userRole))
                 .build();
 
         User saved = userRepository.save(user);

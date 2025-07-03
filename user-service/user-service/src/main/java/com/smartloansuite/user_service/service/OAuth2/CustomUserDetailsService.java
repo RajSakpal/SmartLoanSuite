@@ -1,4 +1,4 @@
-package com.smartloansuite.user_service.service;
+package com.smartloansuite.user_service.service.OAuth2;
 
 import com.smartloansuite.user_service.exception.UserNotFoundException;
 import com.smartloansuite.user_service.repository.UserRepository;

@@ -1,6 +1,9 @@
 package com.smartloansuite.user_service.service.OAuth2;
 
+import com.smartloansuite.user_service.entity.Role;
 import com.smartloansuite.user_service.entity.User;
+import com.smartloansuite.user_service.entity.enums.RoleName;
+import com.smartloansuite.user_service.repository.RoleRepository;
 import com.smartloansuite.user_service.repository.UserRepository;
 import com.smartloansuite.user_service.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +18,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -26,6 +26,7 @@ import java.util.Optional;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -38,17 +39,23 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             String name = oAuth2User.getAttribute("name");
             String username = oAuth2User.getAttribute("username");
 
-            // Check if user exists
-            Optional<User> existingUserOpt = userRepository.findByEmail(email);
+            if (email == null) {
+                throw new OAuth2AuthenticationException("Email not found from OAuth2 provider");
+            }
 
-            User user = existingUserOpt.orElseGet(() -> {
+
+            // Find user or create new one
+            User user = userRepository.findByEmail(email).orElseGet(() -> {
+                Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                        .orElseThrow(() -> new RuntimeException("Default role ROLE_USER not found"));
+
                 User newUser = new User();
                 newUser.setEmail(email);
-                newUser.setUsername(email);
+                newUser.setUsername(username);
                 newUser.setFullName(name);
-                newUser.setRole("USER");
                 newUser.setPassword("N/A");
-                newUser.setEmailVerified(true); // since Google already verifies
+                newUser.setEmailVerified(true);
+                newUser.setRoles(Set.of(userRole));
                 return userRepository.save(newUser);
             });
 
