@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final EmailService emailService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final JwtUtil jwtUtil;
 
@@ -33,14 +35,22 @@ public class UserServiceImpl implements UserService{
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new RuntimeException("Default role not found"));
 
+        String verificationCode = UUID.randomUUID().toString();
+
         User user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
+                .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(Set.of(userRole))
+                .isEmailVerified(false)
+                .verificationCode(verificationCode)
                 .build();
 
         User saved = userRepository.save(user);
+
+        // Send verification email
+        emailService.sendVerificationEmail(saved.getEmail(), saved.getVerificationCode());
 
         return UserResponseDTO.builder()
                 .id(saved.getId())
