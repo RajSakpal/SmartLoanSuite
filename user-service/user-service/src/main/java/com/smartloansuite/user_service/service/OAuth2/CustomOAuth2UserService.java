@@ -51,7 +51,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
                 User newUser = new User();
                 newUser.setEmail(email);
-                newUser.setUsername(username);
+                newUser.setUsername(email.split("@")[0]);
                 newUser.setFullName(name);
                 newUser.setPassword("N/A");
                 newUser.setEmailVerified(true);
