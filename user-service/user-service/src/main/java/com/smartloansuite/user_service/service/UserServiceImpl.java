@@ -56,6 +56,7 @@ public class UserServiceImpl implements UserService{
                 .id(saved.getId())
                 .fullName(saved.getFullName())
                 .email(saved.getEmail())
+                .username(saved.getUsername())
                 .build();
     }
 
@@ -72,11 +73,24 @@ public class UserServiceImpl implements UserService{
             throw new AuthenticationException("Invalid Credentials.");
         }
 
+        String successMessage = "Login successful.";
+
         return LoginResponseDTO.builder()
                 .token(jwtUtil.generateToken(request.getEmail()))
-                .message("Login successful.")
+                .message(successMessage)
                 .build();
     }
 
+    public void deleteUser(String email) {
+        userRepository.deleteByEmail(email);
+    }
+
+    public boolean checkUserExists(String Email) {
+        return userRepository.existsByEmail(Email);
+    }
+
+    private String generateRandomString() {
+        return UUID.randomUUID().toString().substring(0, 8);
+    }
 
 }
